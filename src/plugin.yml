@@ -1,0 +1,6 @@
+name: AntiFreecamInteractions
+main: hasjamon.antifreecaminteractions.AntiFreecamInteractions
+api-version: 1.16
+authors: [ HasJamOn, Bahm, gtg_cya ]
+version: 1.0
+description: AntiFreecamInteractions plugin
