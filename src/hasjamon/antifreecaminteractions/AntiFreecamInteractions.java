@@ -1,12 +1,14 @@
 package hasjamon.antifreecaminteractions;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
@@ -20,20 +22,28 @@ public class AntiFreecamInteractions extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent e){
-        if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
-            Block b = e.getClickedBlock();
+        if(e.getAction() == Action.RIGHT_CLICK_BLOCK)
+            if(notLookingAtBlock(e.getClickedBlock(), e.getPlayer()))
+                e.setCancelled(true);
+    }
 
-            if(b != null){
-                Player p = e.getPlayer();
-                Location pEyeLoc = p.getEyeLocation();
-                Vector direction = pEyeLoc.getDirection();
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockBreak(BlockBreakEvent e){
+        if(notLookingAtBlock(e.getBlock(), e.getPlayer()))
+            e.setCancelled(true);
+    }
 
-                RayTraceResult result = p.getWorld().rayTraceBlocks(pEyeLoc, direction, 6.0);
+    private boolean notLookingAtBlock(Block b, Player p){
+        if(b != null){
+            Location pEyeLoc = p.getEyeLocation();
+            Vector direction = pEyeLoc.getDirection();
 
-                if(result != null && result.getHitBlock() != null)
-                    if(!result.getHitBlock().equals(b))
-                        e.setCancelled(true);
-            }
+            RayTraceResult result = p.getWorld().rayTraceBlocks(pEyeLoc, direction, 6.0);
+
+            if(result != null && result.getHitBlock() != null)
+                return !result.getHitBlock().equals(b);
         }
+
+        return false;
     }
 }
